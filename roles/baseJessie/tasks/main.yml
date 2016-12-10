@@ -1,0 +1,31 @@
+---
+- name: update & upgrade
+  apt: update_cache=yes upgrade=full cache_valid_time=3600
+
+- name: install base debian packages
+  apt: name={{item}} state=latest
+  with_items:
+    - cpufreqd
+    - cpufrequtils
+    - hdparm
+    - udev
+    - ntfs-3g
+    - htop
+    - mosh
+    - vim
+    - tmux
+    - zsh
+    - wget
+    - curl
+    - tree
+    - ncdu
+    - git
+    - unattended-upgrades
+    - curl
+    - wget
+
+
+- name: create APT auto-upgrades configuration
+  copy: >
+    src=auto-upgrades dest=/etc/apt/apt.conf.d/20auto-upgrades
+    owner=root group=root mode=0644

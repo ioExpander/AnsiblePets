@@ -1,0 +1,23 @@
+---
+default_mount_Options: user,auto,exec,rw,nofail
+mounts:
+  - { mountDirName: usbDisk,
+    uuid: 5743dd37-ebc2-4f2e-8b64-acc471e9e7d6,
+    mountOptions: "{{default_mount_Options}}",
+    fstype: ext2
+    }
+  - {mountDirName: backupDisk,
+    uuid: 0BEA5F92527FC1BF,
+    mountOptions: "nobootwait,{{default_mount_Options}}",
+    fstype: ntfs-3g
+    }
+webradios:
+  - { name: FrInter,
+      url: 'http://direct.franceinter.fr/live/franceinter-midfi.mp3'
+    }
+  - { name: F.I.P,
+    url: 'http://direct.fipradio.fr/live/fip-midfi.mp3'
+  }
+  - { name: Radio NOVA,
+    url: 'http://broadcast.infomaniak.net/radionova-high.mp3'
+  }

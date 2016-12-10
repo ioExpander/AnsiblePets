@@ -1,0 +1,9 @@
+[Unit]
+Description=hdparm quiet
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/hdparm -M 128 /dev/sda
+
+[Install]
+WantedBy=multi-user.target

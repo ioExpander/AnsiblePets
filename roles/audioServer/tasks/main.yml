@@ -1,0 +1,118 @@
+---
+- name: install sound card module
+  lineinfile: >
+    dest=/boot/config.txt
+    state=present
+    line='dtoverlay=hifiberry-digi'
+
+- name: create usb disk mount location
+  file: path=/media/{{item.mountDirName}} state=directory mode=0755
+  with_items: '{{mounts}}'
+
+- name: Mount disks and create fstab
+  mount: >
+    name=/media/{{item.mountDirName}}
+    src="UUID={{item.uuid}}"
+    fstype={{item.fstype}}
+    opts={{item.mountOptions}}
+    state=mounted
+  with_items: '{{mounts}}'
+
+- name: add rootdelay to cmdline to wait for usb disk
+  copy: >
+    src=cmdline.txt
+    dest=/boot/cmdline.txt
+    owner=root group=root mode=0755
+
+- name: copy hdparm service file
+  copy: >
+    src=hdparm.service
+    dest=/etc/systemd/system/hdparm.service
+    owner=root group=root mode=0755
+  register: systemctl_reload
+
+- name: reload systemctl files
+  when: systemctl_reload.changed
+  command: systemctl daemon-reload
+
+- name: install and start hdparm.service will fail but ignore failure
+  service: name=hdparm.service state=started enabled=yes
+  ignore_errors: yes
+
+- name: install upmpdcli repo key
+  apt_key: url=http://www.lesbonscomptes.com/key/jf@dockes.org.gpg.key state=present
+
+- name: install upmpdcli repo
+  apt_repository: repo='deb {{item}}' state=present filename='upmpdcli'
+  with_items:
+    - http://www.lesbonscomptes.com/upmpdcli/downloads/debian/ unstable main
+    - http://www.lesbonscomptes.com/upmpdcli/downloads/mpd-debian/ jessie main
+
+- name: install audioServer packages
+  apt: name={{item}} state=latest force=yes
+  with_items:
+    - mpg123
+    - flac
+    - vorbis-tools
+    - upmpdcli
+    - mpd
+    - minidlna
+    - alsa-utils
+
+- name: Configure minidlna block
+  blockinfile:
+    dest: /etc/minidlna.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+      #Custom AudioPi Config
+      media_dir=V,/media/usbDisk/Series
+      media_dir=V,/media/usbDisk/Films
+      media_dir=/media/usbDisk/yDonwloads
+      media_dir=A,/media/usbDisk/Music/9_FLAC/
+      notify_interval=45
+  register: minidlnaConfigured
+
+- name: reload minidlna and build index
+  when: minidlnaConfigured|changed
+  command: service minidlna force-reload
+
+- name: setup minidlna weekly index build
+  cron:
+    name: "rebuild minidlna index"
+    hour: "4"
+    minute: "1"
+    weekday: "6"
+    job: "service minidlna force-reload"
+
+- name: Configure mpd block
+  blockinfile:
+    dest: /etc/mpd.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+      #Custom AudioPi Config
+      bind_to_address "192.168.1.2"
+      audio_output {
+        type            "alsa"
+        name            "DigiPI SPDIF"
+        device          "hw:CARD=sndrpihifiberry,0"
+        mixer_type      "none"
+        auto_resample   "no"
+        auto_channels   "no"
+        auto_format     "no"
+        use_mmap        "yes"
+      }
+  register: mpdConfigured
+
+- lineinfile:
+    dest: /var/lib/mpd/playlists/{{item.name}}.m3u
+    line: '{{item.url}}'
+    create: yes
+    owner: mpd
+    group: audio
+    mode: 0644
+  with_items: '{{webradios}}'
+  register: mpdConfigured
+
+- name: restart MDP and reload config
+  service: name=mpd.service state=restarted
+  when: mpdConfigured|changed
