@@ -45,7 +45,7 @@
 - name: install upmpdcli repo
   apt_repository: repo='deb {{item}}' state=present filename='upmpdcli'
   with_items:
-    - http://www.lesbonscomptes.com/upmpdcli/downloads/debian/ unstable main
+    - http://www.lesbonscomptes.com/upmpdcli/downloads/raspbian-jessie/ unstable main
     - http://www.lesbonscomptes.com/upmpdcli/downloads/mpd-debian/ jessie main
 
 - name: install audioServer packages
