@@ -8,3 +8,9 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub pi@hostname
 
 
 # Usage
+
+# On Raspbian
+run raspi-config utility to :
+- enable SSH server
+- change hostname
+- activate I2C and SPI buses
