@@ -1,0 +1,13 @@
+---
+- name: Clone/update dotfiles from github
+  git:
+    repo: https://github.com/ioExpander/Dotfiles.git
+    dest: ~/Code/Dotfiles
+    force: yes
+  tags: [current]
+
+- name: change shell to zsh
+  become: yes
+  user:
+    name: "{{ansible_user}}"
+    shell: /bin/zsh

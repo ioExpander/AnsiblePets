@@ -1,0 +1,12 @@
+---
+- hosts: PetSecuCamPi
+  roles:
+    - { role: baseJessie, become: yes }
+    - { role: userEnvSetup, become: no }
+    - { role: secuCamServer, become: no }
+  vars:
+    http_port: 80
+  remote_user: pi
+  tasks:
+  - name: ping
+    ping:

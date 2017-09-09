@@ -1,0 +1,84 @@
+---
+- name: Mount tmpfs to prevent SD card wear and create fstab
+  mount:
+    name={{item.mountDirName}}
+    src="tmpfs"
+    fstype=tmpfs
+    opts={{item.mountOptions}}
+    state=mounted
+  with_items: '{{mounts}}'
+  become: yes
+
+- name: install SecuCamServer packages
+  apt: name={{item}} state=latest force=yes
+  with_items:
+    - build-essential
+    - cmake
+    - pkg-config
+    - libjpeg-dev
+    - libtiff5-dev
+    - libjasper-dev
+    - libpng12-dev
+    - libavcodec-dev
+    - libavformat-dev
+    - libswscale-dev
+    - libv4l-dev
+    - libxvidcore-dev
+    - libx264-dev
+    - libgtk2.0-dev
+    - libatlas-base-dev
+    - gfortran
+    - python2.7-dev
+    - python3-dev
+  become: yes
+
+- name: Check if PIP needs to be installed
+  shell: "command -v pip &&echo '1'||echo '0'"
+  register: pip_exists
+  changed_when: false
+  become: yes
+
+- name: install pip
+  shell: "cd /tmp && wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py"
+  when: pip_exists.stdout=="0"
+  become: yes
+
+- name: Install virtualenv
+  pip: name={{item}}
+  with_items:
+      - virtualenv
+      - virtualenvwrapper
+  become: yes
+
+- name: Set workon home path
+  become: no
+  lineinfile:
+    dest: ".profile"
+    regexp: "export WORKON_HOME"
+    line: "export WORKON_HOME=.virtualenvs/"
+    state: present
+    backup: no
+    create: yes
+
+- name: Load virtualenvwrapper.sh
+  become: no
+  lineinfile:
+    dest: ".profile"
+    regexp: "source /usr/local/bin/virtualenvwrapper.sh"
+    line: "source /usr/local/bin/virtualenvwrapper.sh"
+    state: present
+    backup: no
+    create: yes
+
+- name: Make a virtualenv for OpenCV
+  shell: . /usr/local/bin/virtualenvwrapper.sh && mkvirtualenv cv3 -p python3
+  args:
+    executable: /bin/bash
+    creates: ".virtualenvs/cv3/"
+
+- name: Install packages in the cv3 virtualenv
+  become: no
+  pip: name={{item}} virtualenv="~/.virtualenvs/cv3"
+  with_items:
+      - numpy
+      - dropbox
