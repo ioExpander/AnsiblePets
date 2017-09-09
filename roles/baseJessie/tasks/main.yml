@@ -1,24 +1,4 @@
 ---
-- name: reconfigure locales
-  shell: |
-    export LANG=C
-    DEST_LANG="en_US"
-    DEST_LANGUAGE="en"
-    # console
-    # export TERM=linux
-    # reconfigure locales
-    apt-get -qq -y install locales
-    echo -e $DEST_LANG'.UTF-8 UTF-8\n' > /etc/locale.gen
-    echo -e 'fr_FR.UTF-8 UTF-8\n' >> /etc/locale.gen
-    echo -e 'LANG="'$DEST_LANG'.UTF-8"\nLANGUAGE="'$DEST_LANG':'$DEST_LANGUAGE'"\n' > /etc/default/locale
-    export LANG=$DEST_LANG.UTF-8
-    dpkg-reconfigure -f noninteractive locales
-    update-locale
-  args:
-    executable: /bin/bash
-  tags: [current]
-
-
 - name: update & upgrade
   apt: update_cache=yes upgrade=full cache_valid_time=3600
 
@@ -47,9 +27,3 @@
     - wget
     - rsync
     - toilet
-
-
-- name: create APT auto-upgrades configuration
-  copy: >
-    src=auto-upgrades dest=/etc/apt/apt.conf.d/20auto-upgrades
-    owner=root group=root mode=0644

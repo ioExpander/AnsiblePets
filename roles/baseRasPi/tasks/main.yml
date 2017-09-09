@@ -1,0 +1,40 @@
+---
+- name: reconfigure locales
+  shell: |
+    export LANG=C
+    DEST_LANG="en_US"
+    DEST_LANGUAGE="en"
+    # console
+    # export TERM=linux
+    # reconfigure locales
+    apt-get -qq -y install locales
+    echo -e $DEST_LANG'.UTF-8 UTF-8\n' > /etc/locale.gen
+    echo -e 'fr_FR.UTF-8 UTF-8\n' >> /etc/locale.gen
+    echo -e 'LANG="'$DEST_LANG'.UTF-8"\nLANGUAGE="'$DEST_LANG':'$DEST_LANGUAGE'"\n' > /etc/default/locale
+    export LANG=$DEST_LANG.UTF-8
+    dpkg-reconfigure -f noninteractive locales
+    update-locale
+  args:
+    executable: /bin/bash
+  tags: [current]
+
+
+- name: Mount tmpfs to prevent SD card wear and create fstab
+  mount:
+    name={{item.mountDirName}}
+    src="tmpfs"
+    fstype=tmpfs
+    opts={{item.mountOptions}}
+    state=mounted
+  with_items: '{{mounts}}'
+
+- name: install base debian packages
+  apt: name={{item}} state=latest
+  with_items:
+    - git
+    - unattended-upgrades
+
+- name: create APT auto-upgrades configuration
+  copy: >
+    src=auto-upgrades dest=/etc/apt/apt.conf.d/20auto-upgrades
+    owner=root group=root mode=0644

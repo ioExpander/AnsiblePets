@@ -1,14 +1,4 @@
 ---
-- name: Mount tmpfs to prevent SD card wear and create fstab
-  mount:
-    name={{item.mountDirName}}
-    src="tmpfs"
-    fstype=tmpfs
-    opts={{item.mountOptions}}
-    state=mounted
-  with_items: '{{mounts}}'
-  become: yes
-
 - name: install SecuCamServer packages
   apt: name={{item}} state=latest force=yes
   with_items:

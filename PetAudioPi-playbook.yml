@@ -1,6 +1,7 @@
 ---
 - hosts: PetAudioPi
   roles:
+    - baseRasPi
     - baseJessie
     - audioServer
   vars:

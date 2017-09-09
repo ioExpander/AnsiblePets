@@ -1,6 +1,7 @@
 ---
 - hosts: PetSecuCamPi
   roles:
+    - { role: baseRasPi, become: yes }
     - { role: baseJessie, become: yes }
     - { role: userEnvSetup, become: no }
     - { role: secuCamServer, become: no }
