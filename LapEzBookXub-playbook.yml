@@ -1,0 +1,13 @@
+---
+- hosts: ezBook
+  roles:
+    - { role: baseJessie, become: yes }
+    - { role: baseUbuntuDesktop, become: yes }
+    - { role: ezBookLaptop, become: no }
+    - { role: userEnvSetup, become: no }
+  vars:
+    http_port: 80
+  remote_user: adit
+  tasks:
+  - name: ping
+    ping:

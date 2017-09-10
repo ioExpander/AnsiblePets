@@ -1,0 +1,15 @@
+---
+- name: Keys Remap to fix a few bugs in the keyboard
+  become: no
+  lineinfile:
+    dest: ".Xmodmap"
+    state: present
+    backup: no
+    create: yes
+    line: "{{item}}"
+  with_items:
+    - 'keycode 104 = Return'
+    - 'keycode 163 = Prior'
+    - 'keycode 78 = Next'
+    - 'keycode 95 = Home Home Home Home F11 F11 XF86Switch_VT_11'
+    - 'keycode 96 = End End End End F12 F12 XF86Switch_VT_12'

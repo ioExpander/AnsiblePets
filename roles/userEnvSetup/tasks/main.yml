@@ -4,7 +4,6 @@
     repo: https://github.com/ioExpander/Dotfiles.git
     dest: ~/Code/Dotfiles
     force: yes
-  tags: [current]
 
 - name: change shell to zsh
   become: yes

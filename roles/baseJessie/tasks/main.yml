@@ -1,11 +1,9 @@
 ---
-- name: update & upgrade
-  apt: update_cache=yes upgrade=full cache_valid_time=3600
-
 - name: install base debian packages
   apt: name={{item}} state=latest
   with_items:
     - cpufreqd
+    - aptitude
     - cpufrequtils
     - hdparm
     - udev
@@ -27,3 +25,6 @@
     - wget
     - rsync
     - toilet
+
+- name: update & upgrade
+  apt: update_cache=yes upgrade=full cache_valid_time=3600

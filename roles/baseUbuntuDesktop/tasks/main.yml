@@ -1,0 +1,72 @@
+---
+#Other Packages
+- name: other | install base desktop packages
+  apt: name={{item}} state=latest
+  with_items:
+    - sshfs
+    - gparted
+    - ttf-mscorefonts-installer
+    - ubuntu-restricted-extras
+    - typecatcher
+    - command-not-found
+
+# apt tasks file for ansible-role-chrome
+# via http://linuxg.net/how-to-install-google-chrome-42-stable-on-the-most-popular-linux-systems-via-the-official-google-repository/
+- name: "chrome | ensure Google linux signing key present"
+  apt_key: url=https://dl-ssl.google.com/linux/linux_signing_key.pub state=present
+
+- name: "chrome | ensure Google chrome repo present, using a workaround for missing x86 distribution"
+  lineinfile:
+    dest: "/etc/apt/sources.list.d/google-chrome.list"
+    line: "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main"
+    state: present
+    create: yes
+  register: google_repo
+
+- name: "chrome | update cache"
+  apt: update_cache=yes
+  when: google_repo.changed
+
+- name: "chrome | ensure Google chrome present"
+  apt: name=google-chrome-stable update_cache=yes
+
+- name: numix | Add repository
+  apt_repository: repo='ppa:numix/ppa' state=present
+
+- name: "numix | ensure numix packages are present"
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - numix-icon-theme
+    - numix-icon-theme-circle
+
+- name: tlp | Add repository
+  apt_repository: repo='ppa:linrunner/tlp' state=present
+
+- name: "tlp | ensure intel tlp packages are present"
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - tlp
+    - tlp-rdw
+    - cpufreqd
+
+- name: veracrypt | Add repository
+  apt_repository: repo='ppa:unit193/encryption' state=present
+
+- name: "veracrypt | ensure packages are present"
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - veracrypt
+
+- name: atom | Add repository
+  apt_repository: repo='ppa:webupd8team/atom' state=present
+
+- name: "atom | ensure atom packages are present"
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - atom
+
+- name: "keepass | ensure keepass packages are present"
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - xdotool
+    - keepass2
