@@ -8,6 +8,3 @@
   vars:
     http_port: 80
   remote_user: adit
-  tasks:
-  - name: ping
-    ping:

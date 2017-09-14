@@ -2,7 +2,7 @@
 - name: Keys Remap to fix a few bugs in the keyboard
   become: no
   lineinfile:
-    dest: ".Xmodmap"
+    dest: "~/.Xmodmap"
     state: present
     backup: no
     create: yes

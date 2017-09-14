@@ -70,3 +70,18 @@
   with_items:
     - xdotool
     - keepass2
+
+- name: "fonts | copy fonts to home dir"
+  copy: src="fonts/{{item}}" dest="/usr/share/fonts/truetype/{{item}}"
+  with_items:
+    - 'InconsolataGo Bold Nerd Font Complete.ttf'
+    - 'InconsolataGo Bold Nerd Font Complete Mono.ttf'
+    - 'InconsolataGo Nerd Font Complete.ttf'
+    - 'InconsolataGo Nerd Font Complete Mono.ttf'
+  register: fontsUpdate
+
+
+- name: "fonts | update fonts cache"
+  command: fc-cache -f
+  when: fontsUpdate.changed
+  #tags: "current"
