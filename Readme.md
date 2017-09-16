@@ -3,6 +3,10 @@ You don't really need to create a hosts file to run on a single machine :
 ```
 ansible-playbook <Name>-playbook.yml -i "targethost," [--tags=current]
 ```
+To run on localhost you can run :
+```
+ansible-playbook <Name>-playbook.yml -i "localhost," -c local [--tags=current]
+```
 
 # Usage for Raspbian Jessie
 

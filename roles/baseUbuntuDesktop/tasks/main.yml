@@ -71,6 +71,28 @@
     - xdotool
     - keepass2
 
+- name: spotify | add Apt Keys
+  apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id={{item}} state=present
+  with_items:
+    - BBEBDCB318AD50EC6865090613B00F1FD2C19886
+    - 0DF731E45CE24F27EEEB1450EFDC8610341D9410
+
+- name: spotify  | Add repository
+  apt_repository: repo='deb http://repository.spotify.com stable non-free' state=present
+
+- name: "spotify | ensure spotify packages are present"
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - spotify-client
+
+- name: ansible  | Add repository
+  apt_repository: repo='ppa:ansible/ansible' state=present
+
+- name: "ansible | ensure packages are present"
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - ansible
+
 - name: "fonts | copy fonts to home dir"
   copy: src="fonts/{{item}}" dest="/usr/share/fonts/truetype/{{item}}"
   with_items:
