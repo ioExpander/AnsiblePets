@@ -13,3 +13,19 @@
     - 'keycode 78 = Next'
     - 'keycode 95 = Home Home Home Home F11 F11 XF86Switch_VT_11'
     - 'keycode 96 = End End End End F12 F12 XF86Switch_VT_12'
+
+- name: 3D Printer Cura | Add repository
+  apt_repository: repo='ppa:thopiekar/cura' state=present
+
+- name: "3D Printer Cura | ensure packages are present"
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - cura
+    - cura-plugins-all
+    - cura-extra-plugins-all
+
+- name: "3D Printer Repetier | ensure dependencies are installed"
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - mono-reference-assemblies-2.0
+    - mono-devel

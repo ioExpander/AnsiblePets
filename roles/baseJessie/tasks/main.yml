@@ -24,6 +24,7 @@
     - curl
     - wget
     - rsync
+    - anacron
     - toilet
 
 - name: update & upgrade
